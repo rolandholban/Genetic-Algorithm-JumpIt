@@ -13,7 +13,7 @@ def read_file(file_name):
 def generate_population(board):
     population = []
     n = len(board)
-    pop_size = n * 5
+    pop_size = n * 10
     for i in range(pop_size):
         chromosome = [1]
         for j in range(1, n):
@@ -33,6 +33,7 @@ def calculate_fitness(board, chromosome):
     return fitness
 
 
+# Make sure the given chromosome doesnt have two consecutive 0's
 def is_child_valid(child):
     for i in range(1, len(child)):
         if child[i - 1] == 0 and child[i] == 0:
@@ -42,6 +43,7 @@ def is_child_valid(child):
 
 def crossover(parents):
     n = len(parents[0])
+    # Keep mating parents until a valid child is created
     while True:
         cut_index = random.randint(1, n - 2)
         child1 = parents[0][:cut_index] + parents[1][cut_index:]
@@ -61,8 +63,8 @@ def main():
     correct = 0
     for board in boards:
         population = generate_population(board)
-        # Maximum number of generations = 500
-        for generation in range(10):
+        # Maximum number of generations
+        for generation in range(500):
             fitnesses = [calculate_fitness(board, c) for c in population]
 
             # Select the parents and mate
@@ -99,6 +101,7 @@ def main():
         print("----------------------------------------------------")
 
     print("ACCURACY:", correct / len(boards) * 100, "%")
+
 
 if __name__ == '__main__':
     main()
