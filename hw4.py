@@ -1,7 +1,7 @@
 import random
 import dynamic_prog_jumpit
 
-
+# Reads the file into a 2D list
 def read_file(file_name):
     boards = []
     with open(file_name, 'r') as f:
@@ -9,11 +9,11 @@ def read_file(file_name):
             boards.append(list(map(int, line.split())))
     return boards
 
-
+# Generate an initial population size length of the board times 5
 def generate_population(board):
     population = []
     n = len(board)
-    pop_size = n * 10
+    pop_size = n * 5
     for i in range(pop_size):
         chromosome = [1]
         for j in range(1, n):
@@ -59,7 +59,7 @@ def mutate(chromosome):
 
 
 def main():
-    boards = read_file("input1.txt")
+    boards = read_file("input2.txt")
     correct = 0
     for board in boards:
         population = generate_population(board)
@@ -82,9 +82,11 @@ def main():
                 children.remove(child)
 
             # Replace the weak chromosomes in the population with the children
-            weaklings = random.choices(population, weights=fitnesses, k=len(children))
-            for i in range(len(weaklings)):
-                population.remove(weaklings[i])
+            for i in range(len(children)):
+                temp = sorted(fitnesses)
+                index = fitnesses.index(temp[-1])
+                population.remove(population[index])
+                temp.remove(temp[-1])
                 population.append(children[i])
 
         # Check if solution found is correct
@@ -93,11 +95,18 @@ def main():
         if dp_cost == ga_cost:
             correct += 1
 
+        # Build the path taken by the GA
+        ga_path = "0"
+        solution = population[fitnesses.index(min(fitnesses))]
+        for i in range(1, len(solution)):
+            if solution[i] == 1:
+                ga_path += " -> " + str(board[i])
+
         print("Board:", board)
         print("DP Cost:", dp_cost)
         print("DP Path:", dp_path)
         print("GA Cost:", ga_cost)
-        print("GA Path:")
+        print("GA Path:", ga_path)
         print("----------------------------------------------------")
 
     print("ACCURACY:", correct / len(boards) * 100, "%")
