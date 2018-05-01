@@ -9,6 +9,7 @@ def read_file(file_name):
             boards.append(list(map(int, line.split())))
     return boards
 
+
 # Generate an initial population size length of the board times 5
 def generate_population(board):
     population = []
@@ -54,7 +55,7 @@ def crossover(parents):
 
 
 def mutate(chromosome):
-    gene_index = random.randint(0, len(chromosome) - 1)
+    gene_index = random.randint(1, len(chromosome) - 2)
     chromosome[gene_index] = 0 if chromosome[gene_index] == 1 else 1
 
 
@@ -64,7 +65,7 @@ def main():
     for board in boards:
         population = generate_population(board)
         # Maximum number of generations
-        for generation in range(500):
+        for generation in range(800):
             fitnesses = [calculate_fitness(board, c) for c in population]
 
             # Select the parents and mate
@@ -74,7 +75,7 @@ def main():
             # Mutate children
             invalid_children = []
             for child in children:
-                if random.randint(1, 100) == 1:
+                if random.random() <= 0.01:
                     mutate(child)
                     if not is_child_valid(child):
                         invalid_children.append(child)
@@ -83,11 +84,12 @@ def main():
 
             # Replace the weak chromosomes in the population with the children
             for i in range(len(children)):
-                temp = sorted(fitnesses)
-                index = fitnesses.index(temp[-1])
-                population.remove(population[index])
-                temp.remove(temp[-1])
-                population.append(children[i])
+                if calculate_fitness(board, children[i]) <= calculate_fitness(board, parents[i]):
+                    temp = sorted(fitnesses)
+                    index = fitnesses.index(temp[-1])
+                    population.remove(population[index])
+                    temp.remove(temp[-1])
+                    population.append(children[i])
 
         # Check if solution found is correct
         dp_cost, dp_path = dynamic_prog_jumpit.main(board)
